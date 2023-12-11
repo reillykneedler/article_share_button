@@ -1,0 +1,53 @@
+<style>
+  .share-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .share-button-link {
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #c7d3dd;
+    color: #333;
+    width: 175px;
+    margin: 10px;
+    cursor: pointer;
+    padding: 10px 15px;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .share-button-link:hover {
+    background-color: #b0bcc8;
+  }
+</style>
+
+<div class="share-button-container">
+  <button
+    id="shareArticleButton"
+    class="share-button-link"
+    type="button"
+    onclick="ShareArticleLink();"
+    aria-label="Copy article link to clipboard"
+  >
+    Copy article link
+  </button>
+</div>
+
+<script>
+  async function ShareArticleLink() {
+    try {
+      const text =
+        window.location.href +
+        "/?utm_medium=referral&utm_source=shareArticleButton&utm_campaign=shareArticleButton";
+      await navigator.clipboard.writeText(text);
+      document.getElementById("shareArticleButton").innerHTML = "Link copied!";
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  }
+</script>
