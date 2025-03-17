@@ -1,11 +1,11 @@
+<!-- CSS with namespaced classes to avoid conflicts -->
 <style>
-  .share-button-container {
+  .share-btn-container {
     display: flex;
     justify-content: center;
     align-items: center;
   }
-
-  .share-button-link {
+  .share-btn-link {
     border-radius: 5px;
     border: 1px solid #333;
     background-color: #c7d3dd;
@@ -19,35 +19,73 @@
     text-align: center;
     text-decoration: none;
     display: inline-block;
+    transition: background-color 0.3s ease;
   }
-
-  .share-button-link:hover {
+  .share-btn-link:hover {
     background-color: #b0bcc8;
+  }
+  .share-btn-link:focus {
+    outline: 2px solid #4a90e2;
   }
 </style>
 
-<div class="share-button-container">
+<!-- HTML with no inline JavaScript -->
+<div class="share-btn-container">
   <button
     id="shareArticleButton"
-    class="share-button-link"
+    class="share-btn-link"
     type="button"
-    onclick="ShareArticleLink();"
     aria-label="Copy article link to clipboard"
   >
     Copy article link
   </button>
 </div>
 
+<!-- JavaScript with proper event handling and error feedback -->
 <script>
-  async function ShareArticleLink() {
-    try {
-      const text =
-        window.location.href +
-        "/?utm_medium=referral&utm_source=shareArticleButton&utm_campaign=shareArticleButton";
-      await navigator.clipboard.writeText(text);
-      document.getElementById("shareArticleButton").innerHTML = "Link copied!";
-    } catch (err) {
-      console.error("Failed to copy: ", err);
+  // Wait for DOM to be fully loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    const shareButton = document.getElementById('shareArticleButton');
+    
+    if (shareButton) {
+      // Add event listener instead of inline onclick
+      shareButton.addEventListener('click', shareArticleLink);
     }
-  }
+    
+    async function shareArticleLink() {
+      const originalText = shareButton.textContent;
+      
+      try {
+        // Create the URL with UTM parameters
+        const url = new URL(window.location.href);
+        url.searchParams.append('utm_medium', 'share');
+        url.searchParams.append('utm_source', 'shareArticleButton');
+        url.searchParams.append('utm_campaign', 'shareArticleButton');
+        
+        // Copy to clipboard
+        await navigator.clipboard.writeText(url.toString());
+        
+        // Visual feedback
+        shareButton.textContent = "Link copied!";
+        shareButton.style.backgroundColor = "#a3d39c"; // Success color
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+          shareButton.textContent = originalText;
+          shareButton.style.backgroundColor = "#c7d3dd";
+        }, 2000);
+      } catch (err) {
+        // Error feedback
+        console.error("Failed to copy: ", err);
+        shareButton.textContent = "Copy failed";
+        shareButton.style.backgroundColor = "#e6a5a5"; // Error color
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+          shareButton.textContent = originalText;
+          shareButton.style.backgroundColor = "#c7d3dd";
+        }, 2000);
+      }
+    }
+  });
 </script>
