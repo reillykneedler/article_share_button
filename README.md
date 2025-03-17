@@ -15,3 +15,6 @@ You may need to adjust the presentation of the button depending on your site's e
 ### Contact
 
 Have questions? Reach me at reilly.kneedler at wickcommunications.com.
+
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
