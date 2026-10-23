@@ -1,91 +1,243 @@
-<!-- CSS with namespaced classes to avoid conflicts -->
+<!-- Copy-article-link button: canonical URL, clean UTMs, GA4 share event, fallback copy -->
 <style>
   .share-btn-container {
+    /* Theme tokens: override these to match the site */
+    --share-fg: #1d2939;
+    --share-muted: #475467;
+    --share-bg: #ffffff;
+    --share-bg-hover: #f2f4f7;
+    --share-border: #d0d5dd;
+    --share-ring: rgba(46, 144, 250, 0.35);
+    --share-success-fg: #067647;
+    --share-success-bg: #ecfdf3;
+    --share-success-border: #abefc6;
+    --share-error-fg: #b42318;
+    --share-error-bg: #fef3f2;
+    --share-error-border: #fecdca;
+
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 16px 0;
   }
+
   .share-btn-link {
-    border-radius: 5px;
-    border: 1px solid #333;
-    background-color: #c7d3dd;
-    color: #333;
-    width: 175px;
-    margin: 10px;
-    cursor: pointer;
-    padding: 10px 15px;
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 168px;
+    height: 40px;
+    padding: 0 18px;
+    border: 1px solid var(--share-border);
+    border-radius: 999px;
+    background: var(--share-bg);
+    color: var(--share-fg);
+    font: inherit;
     font-size: 14px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    transition: background-color 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
   }
+
   .share-btn-link:hover {
-    background-color: #b0bcc8;
+    background: var(--share-bg-hover);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
   }
-  .share-btn-link:focus {
-    outline: 2px solid #4a90e2;
+
+  .share-btn-link:active { transform: scale(0.97); }
+
+  .share-btn-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--share-ring);
+  }
+
+  .share-btn-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--share-muted);
+    transition: color 0.15s ease;
+  }
+
+  .share-btn-icon--check,
+  .share-btn-icon--error { display: none; }
+
+  /* Success */
+  .share-btn-link.is-success {
+    background: var(--share-success-bg);
+    border-color: var(--share-success-border);
+    color: var(--share-success-fg);
+  }
+  .share-btn-link.is-success .share-btn-icon { color: var(--share-success-fg); }
+  .share-btn-link.is-success .share-btn-icon--link { display: none; }
+  .share-btn-link.is-success .share-btn-icon--check {
+    display: block;
+    animation: share-pop 0.25s ease;
+  }
+
+  /* Error */
+  .share-btn-link.is-error {
+    background: var(--share-error-bg);
+    border-color: var(--share-error-border);
+    color: var(--share-error-fg);
+  }
+  .share-btn-link.is-error .share-btn-icon { color: var(--share-error-fg); }
+  .share-btn-link.is-error .share-btn-icon--link { display: none; }
+  .share-btn-link.is-error .share-btn-icon--error { display: block; }
+
+  @keyframes share-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    70% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .share-btn-link,
+    .share-btn-icon { transition: none; }
+    .share-btn-link:active { transform: none; }
+    .share-btn-link.is-success .share-btn-icon--check { animation: none; }
+  }
+
+  .share-btn-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 </style>
 
-<!-- HTML with no inline JavaScript -->
 <div class="share-btn-container">
-  <button
-    id="shareArticleButton"
-    class="share-btn-link"
-    type="button"
-    aria-label="Copy article link to clipboard"
-  >
-    Copy article link
+  <button class="share-btn-link js-share-article" type="button">
+    <svg class="share-btn-icon share-btn-icon--link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </svg>
+    <svg class="share-btn-icon share-btn-icon--check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+    <svg class="share-btn-icon share-btn-icon--error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span class="share-btn-label">Copy article link</span>
   </button>
+  <span class="share-btn-status" role="status" aria-live="polite"></span>
 </div>
 
-<!-- JavaScript with proper event handling and error feedback -->
 <script>
-  // Wait for DOM to be fully loaded
-  document.addEventListener('DOMContentLoaded', function() {
-    const shareButton = document.getElementById('shareArticleButton');
-    
-    if (shareButton) {
-      // Add event listener instead of inline onclick
-      shareButton.addEventListener('click', shareArticleLink);
-    }
-    
-    async function shareArticleLink() {
-      const originalText = shareButton.textContent;
-      
+(function () {
+  // Lowercase, consistent values. GA4 is case-sensitive.
+  var UTM = {
+    utm_source: 'copy_link',
+    utm_medium: 'share',
+    utm_campaign: 'article_share'
+  };
+
+  // Params that should never ride along on a shared link
+  var STRIP = /^(utm_.*|fbclid|gclid|gbraid|wbraid|msclkid|mc_cid|mc_eid|_ga|_gl)$/i;
+
+  function buildShareUrl() {
+    var canonical = document.querySelector('link[rel="canonical"]');
+    var base = canonical && canonical.href ? canonical.href : window.location.href;
+    var url = new URL(base);
+    url.hash = '';
+    Array.from(url.searchParams.keys()).forEach(function (key) {
+      if (STRIP.test(key)) url.searchParams.delete(key);
+    });
+    Object.keys(UTM).forEach(function (key) {
+      url.searchParams.set(key, UTM[key]);
+    });
+    return url.toString();
+  }
+
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
       try {
-        // Create the URL with UTM parameters
-        const url = new URL(window.location.href);
-        url.searchParams.append('utm_medium', 'share');
-        url.searchParams.append('utm_source', 'shareArticleButton');
-        url.searchParams.append('utm_campaign', 'shareArticleButton');
-        
-        // Copy to clipboard
-        await navigator.clipboard.writeText(url.toString());
-        
-        // Visual feedback
-        shareButton.textContent = "Link copied!";
-        shareButton.style.backgroundColor = "#a3d39c"; // Success color
-        
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          shareButton.textContent = originalText;
-          shareButton.style.backgroundColor = "#c7d3dd";
-        }, 2000);
-      } catch (err) {
-        // Error feedback
-        console.error("Failed to copy: ", err);
-        shareButton.textContent = "Copy failed";
-        shareButton.style.backgroundColor = "#e6a5a5"; // Error color
-        
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          shareButton.textContent = originalText;
-          shareButton.style.backgroundColor = "#c7d3dd";
-        }, 2000);
-      }
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) { /* fall through to legacy copy */ }
     }
-  });
+    return legacyCopy(text);
+  }
+
+  // GA4 recommended "share" event, sent through Site Kit's gtag
+  function track(ok) {
+    if (typeof window.gtag !== 'function') return; // blocked, or GA not loaded
+    window.gtag('event', 'share', {
+      method: 'copy_link',
+      content_type: 'article',
+      item_id: window.location.pathname,
+      share_status: ok ? 'success' : 'error'
+    });
+  }
+
+  function wire(btn) {
+    if (btn.dataset.shareWired) return; // safe if the snippet appears twice
+    btn.dataset.shareWired = '1';
+
+    var labelEl = btn.querySelector('.share-btn-label') || btn;
+    var label = labelEl.textContent;      // captured once, not per click
+    var status = btn.parentNode.querySelector('.share-btn-status');
+    var timer;
+
+    btn.addEventListener('click', async function () {
+      var shareUrl = buildShareUrl();
+      var ok = await copyText(shareUrl);
+      track(ok);
+
+      clearTimeout(timer);
+      btn.classList.remove('is-success', 'is-error');
+      void btn.offsetWidth; // restart the check animation on repeat clicks
+      btn.classList.add(ok ? 'is-success' : 'is-error');
+      labelEl.textContent = ok ? 'Link copied' : 'Copy failed';
+      if (status) status.textContent = ok ? 'Article link copied to clipboard' : 'Could not copy link';
+
+      if (!ok) window.prompt('Copy this link:', shareUrl);
+
+      timer = setTimeout(function () {
+        labelEl.textContent = label;
+        btn.classList.remove('is-success', 'is-error');
+        if (status) status.textContent = '';
+      }, 2000);
+    });
+  }
+
+  function init() {
+    document.querySelectorAll('.js-share-article').forEach(wire);
+  }
+
+  // Works whether the script runs before or after DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
