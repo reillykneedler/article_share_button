@@ -116,6 +116,29 @@
     clip: rect(0 0 0 0);
     white-space: nowrap;
   }
+
+  /* Harden icons against theme SVG rules (e.g. Newspack fills SVGs by default).
+     CSS beats SVG presentation attributes, so paint is set here explicitly. */
+  .share-btn-container .share-btn-icon {
+    fill: none !important;
+    stroke: currentColor !important;
+    width: 16px;
+    height: 16px;
+    max-width: none;
+    vertical-align: middle;
+  }
+  .share-btn-container .share-btn-icon path,
+  .share-btn-container .share-btn-icon polyline,
+  .share-btn-container .share-btn-icon line,
+  .share-btn-container .share-btn-icon circle {
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+  .share-btn-container .share-btn-icon--link path,
+  .share-btn-container .share-btn-icon--error * { stroke-width: 2 !important; }
+  .share-btn-container .share-btn-icon--check polyline { stroke-width: 2.5 !important; }
 </style>
 
 <div class="share-btn-container">
